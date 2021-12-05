@@ -3,13 +3,20 @@ import sqlite3
 import pandas as pd
 from tabulate import tabulate
 import os
+import pi_data
 
 class StorageTools:
     def __init__(self) -> None:
         self.nday = False
         self.dataframe = pd.DataFrame()
-        self.home_dir = os.environ["HOMEPATH"]
+        self.pi_df = pd.DataFrame()
+        pi_data.HatInitialize()
 
+        if os.name == 'nt':
+            home_key = "HOMEPATH"
+        else:
+            home_key = "HOME"
+        self.home_dir = os.environ[home_key]
         # Check for Program Directory - Create if does not exist
         if not os.path.isdir(os.path.join(self.home_dir, "_WTrack")):
             os.mkdir(os.path.join(self.home_dir, "_WTrack"))
@@ -17,6 +24,7 @@ class StorageTools:
         # Set Database and CSV file paths and names
         self.db_path = os.path.join(self.home_dir, "_WTrack", "WTracker.sqlite")
         self.csv_path = os.path.join(self.home_dir, "_WTrack", "WTracker.csv")
+        self.pidata_path = os.path.join(self.home_dir, "_WTrack", "WTracker_Pi.csv")
 
         
         # Open a db connection
@@ -37,13 +45,12 @@ class StorageTools:
             dp.high = wdata[12]
             dp.low = wdata[13]
             self.nday = True
-        self.ConvertFrame(dp)
+        self.ProcessAWeatherData(dp)
 
     def PrintFrameData(self):
         print(tabulate(self.dataframe, headers = "keys"))
 
-
-    def ConvertFrame(self, datapoint):
+    def ProcessAWeatherData(self, datapoint):
         # Take DataPoint object and convert to pandas dataframe
         frame = pd.DataFrame()
         buffer = {"Timestamp": pd.Series([str(datapoint.datetime)]),
@@ -65,7 +72,7 @@ class StorageTools:
         self.dataframe = self.dataframe.append(frame)   
 
         # Create/Append data to sql db, commit changes, create csv file
-        frame.to_sql("Weather Datapoints", self.db_conn, if_exists='append')
+        frame.to_sql("AccuWeather Datapoints", self.db_conn, if_exists='append')
         self.db_conn.commit()
 
         # Push entire dataframe to csv
@@ -73,6 +80,26 @@ class StorageTools:
 
         # Nicely Output Frame Data
         # print("Frame\n" + tabulate(frame, headers = buffer.keys()))
+    
+    def ProcessPiData(self, tempd, humdd, presd):
+        frame = pd.DataFrame()
+        buffer = {"Timestamp": pd.Series([str(datapoint.datetime)]),
+                       "Current_Temperature": pd.Series([tempd]),
+                       "Wind_Speed": pd.Series([humdd]),
+                       "Wind_Gust": pd.Series([presd])
+                    }
+        frame = frame.append(pd.DataFrame(buffer))
+
+        # Append current interation's pi sensor data to master dataframe
+        self.pi_df = self.pi_df.append(frame)   
+
+        # Create/Append data to sql db, commit changes, create csv file
+        frame.to_sql("SenseHat Datapoints", self.db_conn, if_exists='append')
+        self.db_conn.commit()
+
+        # Push entire dataframe to csv
+        self.dataframe.to_csv(path_or_buf = self.pidata_path, na_rep = "-")
+
 
     def CloseDatabase(self):    
         self.db_conn.close()
