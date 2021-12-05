@@ -20,18 +20,19 @@
 #--------------------------------------------------
 # Known Issues:
 # 1. Location is hard-coded
-#
+# 2. init_url must be an accuweather location and use the More Details Page. The Regular page will break the app
 #--------------------------------------------------
 
 import bs4 as beaut
 import urllib.request as urllib
 from datetime import datetime, date
 import re
+import bs4.builder._lxml
 
 class PullPageData():
     def __init__(self) -> None:
         self.sys_date = any
-        self.init_url = "https://www.accuweather.com/en/us/new-york/10007/weather-forecast/349727"
+        self.init_url = "https://www.accuweather.com/en/us/lake-worth/33460/current-weather/332279"
         self.request = any
         self.SetHeaders(self.init_url)      
 
@@ -61,7 +62,7 @@ class PullPageData():
 
             # Append Date & Time Stamp to list
             weather_data.append(datetime.now().strftime("%A - %B %d %Y - %I:%M:%S%p"))
-
+            # print(_html.find_all())
             # Parse Current Weather Data
             # print(_html.find_all("div", class_= ["detail-item spaced-content", "display-temp"]))
             cw_data_raw = _html.find_all("div", class_= ["detail-item spaced-content", "display-temp"])
@@ -98,6 +99,6 @@ class PullPageData():
         for val in weather_data[1:]:
             wd_clean.append(re.sub("[^0-9]", "", val))
         
-        # print(weather_data)
+       # print(weather_data)
 
         return wd_clean

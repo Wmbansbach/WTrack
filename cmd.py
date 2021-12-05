@@ -26,12 +26,14 @@
 #--------------------------------------------------
 from inputimeout import inputimeout, TimeoutOccurred
 import os
+import pi_data
 
 class CmdInterface():
     def __init__(self, scraper, toolbox):
         # self.DisplayMain()
         self.scraper = scraper
         self.toolbox = toolbox
+        self.sensor = pi_data.Sensor()
         self.exit = False
         self.live = False
         self.toolbox.ConvertObj(self.scraper.ScrapePage())
@@ -101,6 +103,8 @@ class CmdInterface():
 
             except TimeoutOccurred:
                 self.toolbox.ConvertObj(self.scraper.ScrapePage())
+                x, y, z = self.sensor.GetLocalEnvData()
+                self.toolbox.ProcessPiData(x, y, z)
 
             finally:
                 os.system('cls' if os.name == 'nt' else 'clear')
