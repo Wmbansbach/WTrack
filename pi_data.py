@@ -2,6 +2,7 @@ from sense_hat import SenseHat
 import time
 
 class Sensor:
+
     def __init__(self) -> None:
            self.sense = SenseHat()
 
@@ -18,6 +19,7 @@ class Sensor:
         k = (0, 0, 0)       # blank
 
         rainbow = [r, o, y, g, c, b, p, n]
+
         self.sense.clear()
 
         for y in range(8):
@@ -26,7 +28,9 @@ class Sensor:
                 self.sense.set_pixel(x, y, colour)
         
         time.sleep(2)
+
         self.sense.clear()
+
 
     def GetLocalEnvData(self):
         temp_data = list()
@@ -46,6 +50,5 @@ class Sensor:
             temp_master += float(temp_data[i])
             humid_master += float(humid_data[i])
             pres_master += float(pres_data[i])
-            
         return temp_master / 5, humid_master / 5, pres_master / 5
 

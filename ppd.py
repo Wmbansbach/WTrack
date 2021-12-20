@@ -17,6 +17,8 @@
 # Change Log:
 # * 11/25/2021
 #   - Initial concept created
+# * 12/10/2021
+#   - Simplified timestamp format
 #--------------------------------------------------
 # Known Issues:
 # 1. Location is hard-coded
@@ -27,7 +29,6 @@ import bs4 as beaut
 import urllib.request as urllib
 from datetime import datetime, date
 import re
-import bs4.builder._lxml
 
 class PullPageData():
     def __init__(self) -> None:
@@ -61,10 +62,11 @@ class PullPageData():
             _html = beaut.BeautifulSoup(html, "lxml")
 
             # Append Date & Time Stamp to list
-            weather_data.append(datetime.now().strftime("%A - %B %d %Y - %I:%M:%S%p"))
-            # print(_html.find_all())
+            # Saturday - December 11 2021 - 11:16:43PM
+            # weather_data.append(datetime.now().strftime("%A - %B %d %Y - %I:%M:%S%p"))
+            weather_data.append(datetime.now().strftime("%m/%d/%Y-%I:%M:%S%p"))
+            
             # Parse Current Weather Data
-            # print(_html.find_all("div", class_= ["detail-item spaced-content", "display-temp"]))
             cw_data_raw = _html.find_all("div", class_= ["detail-item spaced-content", "display-temp"])
             """Raw Data Before Cleaning:
                 > Current Temperature
@@ -86,7 +88,6 @@ class PullPageData():
                 weather_data.append(s_list[len(s_list)-2])
 
             # High and Low for Day (Only Pull Once Daily)
-            # print((_html.find_all("div", class_= "temperature", limit=2)))
             if date.today() != self.sys_date:
                 hl_data_raw = _html.find_all("div", class_= "temperature", limit=2)
                 for drd in hl_data_raw:
@@ -98,7 +99,5 @@ class PullPageData():
         wd_clean = [weather_data[0]]
         for val in weather_data[1:]:
             wd_clean.append(re.sub("[^0-9]", "", val))
-        
-       # print(weather_data)
 
         return wd_clean

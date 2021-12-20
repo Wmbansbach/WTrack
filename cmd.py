@@ -5,42 +5,42 @@
 #--------------------------------------------------
 # Documentation:
 # * Parameters
-#   > [Param 1]   - [Param 1 Description]
+#   > scraper - PullPageData object for scraping page
 #   
-# * Example
-#   > [Example 1]
-#
-# * Logging
-#   > [Description] 
+#   > toolbox - StorageTools object for db, csv processing
 #
 #--------------------------------------------------
 # Change Log:
 # * 11/25/2021
 #   - Initial concept created
-# * 11/27/2021
-#   -
+# * 12/19/2021
+#   - Changed quit to term
+#   - Changed attack naming scheme to - instead of --
+#   - Added some time for help message to be read before clearing screen
+#   - Added commenting
 #--------------------------------------------------
 # Known Issues:
-# 1. 
+# 1. Graphing does not work on debian
 #
 #--------------------------------------------------
 from inputimeout import inputimeout, TimeoutOccurred
 import os
-import pi_data
+from time import sleep
+import graphing
 
-class CmdInterface():
+class CmdInterface:
     def __init__(self, scraper, toolbox):
-        # self.DisplayMain()
         self.scraper = scraper
         self.toolbox = toolbox
-        self.sensor = pi_data.Sensor()
-        self.exit = False
-        self.live = False
-        self.toolbox.ConvertObj(self.scraper.ScrapePage())
-        self.DisplayMain()
+        self.grapher = graphing.GraphData() 
+        self.exit = False                                   # Flag to end loop when needed
+        self.live = False                                   # Switch live view on and off
+        self.show = False                                   # Switch show view on and off
+        self.toolbox.ConvertObj(self.scraper.ScrapePage())  # Start scraping
+        self.DisplayMain()                                  # Initialize txt interface
 
-    def DisplayGraphing(self):
-        print('Weather Tracker Graphing Options')
+    def DisplayGraphing(self):                              # Graphing Interface Options
+        print('Graphing Options')
         print('====================================')
         print('Graphing Options')
         print('1. Option 1')
@@ -50,64 +50,72 @@ class CmdInterface():
             sel = input(":")
 
             if sel == '1':
-                pass
+                self.grapher.TemperatureTSeries(self.toolbox.PullPrintCSVData())
+                return
             elif sel == '2':
                 pass
             elif sel == '-back':
                 return
-            elif sel == '--quit':
+            elif sel == '-term':
                 self.exit = True
             else:
                 print()
                 print('That is not a recognized command..')
                 print()
-
-    def DisplayMain(self):
-        print('Weather Tracker')
-        print('====================================')
+                sleep(2)
+            
+    def DisplayMain(self):                                          # Main Interface
         while not self.exit:
-            try:
+            try:                                                    # Check for live and show flags before prompting
                 if self.live:
                     self.toolbox.PrintFrameData()
-                print('Type a command: (--help for help)')
+                if self.show:
+                    self.toolbox.PullPrintCSVData(to_print = True)
+                print('Weather Tracker')
+                print('====================================')
+                print('Type a command: (-help for help)')
+                sel = inputimeout(">>", timeout=30)                 # Input command will timeout every 30 seconds\
 
-                # Input command will timeout every 30 seconds. At which time, the website will be queried again
-                sel = inputimeout(">>", timeout=30)
-
-                if sel == '--help':
-                    print()
-                    print('-live\tShow data as it is ingressed')
+                if sel == '-help':                                  # Help Interface Options
+                    print('Attack Options')
+                    print('====================================')
+                    print('-show\tShow all data in file')
+                    print('-live\tShow incoming data')
                     print('-graph\tDisplay graphing options')
-                    print('-quit or q\tClose the application')
+                    print('-term or q\tClose the application')
                     print()           
-
-                elif sel == '-live':
+                    sleep(5)
+                elif sel == '-live' or sel == '-l':                 # Live View
                     if self.live:
                         self.live = False
                     else:
                         self.live = True
-                    continue
 
+                elif sel == '-show' or sel == '-s':                 # Show View
+                    if self.show:
+                        self.show = False
+                    else:
+                        self.show = True
 
-                elif sel == '-graph':
+                elif sel == '-graph' or sel == '-g':                # Graphing Interface Options
                     self.DisplayGraphing()
-                    continue
 
-                elif sel == '--quit':
+                elif sel == '-term' or sel == '-t':                 # Terminate Program
                     self.exit = True
 
                 else:
                     print()
                     print('That is not a recognized command..')
                     print()
+                    sleep(2)
 
-            except TimeoutOccurred:
-                self.toolbox.ConvertObj(self.scraper.ScrapePage())
-                x, y, z = self.sensor.GetLocalEnvData()
-                self.toolbox.ProcessPiData(x, y, z)
+            except TimeoutOccurred:                                 # Catch inputtimeout
+                self.toolbox.ConvertObj(self.scraper.ScrapePage())  # Scrape page again
+                if self.toolbox.on_pi:                              # Pull and Process Pi data if needed
+                    x, y, z = self.toolbox.sensor.GetLocalEnvData()
+                    self.toolbox.ProcessPiData(x, y, z)
 
             finally:
-                os.system('cls' if os.name == 'nt' else 'clear')
-                
+                os.system('cls' if os.name == 'nt' else 'clear')    # Clear screen depending on os
 
             
