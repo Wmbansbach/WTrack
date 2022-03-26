@@ -89,21 +89,25 @@ class StorageTools:
 
     def ConvertObj(self, wdata):
         dp = datapoint.DataPoint()
-        dp.datetime, dp.curr_temp, \
-        dp.wind, dp.wind_gust, \
-        dp.humidity, dp.pressure, \
-        dp.cloud_cover, dp.cloud_height = [wdata[v] for v in (0, 1, 2, 3, 4, 7, 8, 10)]
-       
-        if len(wdata) == 13:         # To fix case where day and night data scaped changes by one
-            dp.high = wdata[11]
-            dp.low = wdata[12]
-            self.nday = True
-        elif len(wdata) == 14:
-            dp.high = wdata[12]
-            dp.low = wdata[13]
-        else:
-            # Case where incomplete data is scaped from page
-            pass
+        try:
+            dp.datetime, dp.curr_temp, \
+            dp.wind, dp.wind_gust, \
+            dp.humidity, dp.pressure, \
+            dp.cloud_cover, dp.cloud_height = [wdata[v] for v in (0, 1, 2, 3, 4, 7, 8, 10)]
+        
+            if len(wdata) == 13:         # To fix case where day and night data scaped changes by one
+                dp.high = wdata[11]
+                dp.low = wdata[12]
+                self.nday = True
+            elif len(wdata) == 14:
+                dp.high = wdata[12]
+                dp.low = wdata[13]
+            else:
+                # Case where incomplete data is scaped from page
+                pass
+        except IndexError:
+            print(wdata)
+            input("INGRESS FAILED: SAVE DATA ABOVE")
         
         self.ProcessAWeatherData(dp)
 

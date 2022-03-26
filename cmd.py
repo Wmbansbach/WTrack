@@ -15,13 +15,12 @@
 #   - Initial concept created
 # * 12/19/2021
 #   - Changed quit to term
-#   - Changed attack naming scheme to - instead of --
+#   - Changed command naming scheme to - instead of --
 #   - Added some time for help message to be read before clearing screen
 #   - Added commenting
 #--------------------------------------------------
 # Known Issues:
 # 1. Graphing does not work on debian
-#
 #--------------------------------------------------
 from inputimeout import inputimeout, TimeoutOccurred
 import os
@@ -42,7 +41,6 @@ class CmdInterface:
     def DisplayGraphing(self):                              # Graphing Interface Options
         print('Graphing Options')
         print('====================================')
-        print('Graphing Options')
         print('1. Option 1')
         print('2. Option 2')
         
@@ -66,15 +64,15 @@ class CmdInterface:
             
     def DisplayMain(self):                                          # Main Interface
         while not self.exit:
-            try:                                                    # Check for live and show flags before prompting
+            try:                                                    # Check for live and show flags before prompting. 
                 if self.live:
                     self.toolbox.PrintFrameData()
                 if self.show:
                     self.toolbox.PullPrintCSVData(to_print = True)
-                print('Weather Tracker')
+                print('\nWeather Tracker')
                 print('====================================')
                 print('Type a command: (-help for help)')
-                sel = inputimeout(">>", timeout=30)                 # Input command will timeout every 30 seconds\
+                sel = inputimeout(">>", timeout=30)                 # Input command will timeout every 30 seconds
 
                 if sel == '-help':                                  # Help Interface Options
                     print('Attack Options')
@@ -100,7 +98,7 @@ class CmdInterface:
                 elif sel == '-graph' or sel == '-g':                # Graphing Interface Options
                     self.DisplayGraphing()
 
-                elif sel == '-term' or sel == '-t':                 # Terminate Program
+                elif sel == '-term' or sel == '-t':                 # End cmd loop to terminate program
                     self.exit = True
 
                 else:
@@ -109,9 +107,9 @@ class CmdInterface:
                     print()
                     sleep(2)
 
-            except TimeoutOccurred:                                 # Catch inputtimeout
+            except TimeoutOccurred:                                 # Catch inputtimeout 
                 self.toolbox.ConvertObj(self.scraper.ScrapePage())  # Scrape page again
-                if self.toolbox.on_pi:                              # Pull and Process Pi data if needed
+                if self.toolbox.on_pi:                              # Pull and Process Pi data if applicable
                     x, y, z = self.toolbox.sensor.GetLocalEnvData()
                     self.toolbox.ProcessPiData(x, y, z)
 

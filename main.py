@@ -25,6 +25,7 @@
 #--------------------------------------------------
 # Known Issues:
 # 1. Will not scrape site if graph is displayed (fix this by threading graphing)
+# 2. Grafana interface is not functional (graf.py)
 #--------------------------------------------------
 
 from ppd import PullPageData

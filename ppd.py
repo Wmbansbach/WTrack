@@ -23,6 +23,7 @@
 # Known Issues:
 # 1. Location is hard-coded
 # 2. init_url must be an accuweather location and use the More Details Page. The Regular page will break the app
+# 3. Scraping is dependent on the accuweather page being static. If formatting changes are made the app will likely break
 #--------------------------------------------------
 
 import bs4 as beaut

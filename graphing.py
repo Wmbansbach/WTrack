@@ -21,9 +21,9 @@
 # Known Issues:
 # 1. 
 #--------------------------------------------------
-import matplotlib.pyplot as plt
-import numpy as np
-
+# import matplotlib.pyplot as plt
+# import numpy as np
+import plotly.express as px
 
 class GraphData:
     def __init__(self):
@@ -38,14 +38,16 @@ class GraphData:
             date, time = i.split('-')
             buffer.append(time)
         time_df = buffer
+        print(dataframe)
+        # plt.rcdefaults()
+        # plt.plot(time_df, temp_df)
 
-        plt.rcdefaults()
-        plt.plot(time_df, temp_df)
-
-        plt.title('Temperature Over Time')
-        plt.xlabel('Time')
-        plt.ylabel('Temperature (Degrees F)')
-        plt.xticks(rotation=45)
-        plt.show()
+        # plt.title('Temperature Over Time')
+        # plt.xlabel('Time')
+        # plt.ylabel('Temperature (Degrees F)')
+        # plt.xticks(rotation=45)
+        # plt.show()
+        fig = px.line(dataframe, x=time_df, y=temp_df, title="Temperature Over Time")
+        fig.show()
     
     
