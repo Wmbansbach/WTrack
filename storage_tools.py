@@ -49,8 +49,14 @@ class StorageTools:
             self.on_pi = True
 
             import pi_data
-            self.sensor = pi_data.Sensor()
-            self.sensor.HatInitialize()
+            try:
+                self.sensor = pi_data.SHSensor()
+                self.sensor.HatInitialize()
+            except OSError:
+                print("No Hat Found")
+            finally:
+                self.sensor = pi_data.HDTSensor()
+                
         self.home_dir = os.environ[self.home_key]
 
         # Check for application Directory - Create if does not exist
