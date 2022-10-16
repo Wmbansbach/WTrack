@@ -1,10 +1,15 @@
 from sense_hat import SenseHat
 import time
 
-class Sensor:
+class HDTSensor:
+    def __init__(self) -> None:
+        self.sense = any
+        print("HDT Loaded Successfully...")
+
+class SHSensor:
 
     def __init__(self) -> None:
-           self.sense = SenseHat()
+        self.sense = SenseHat()
 
     def HatInitialize(self):
         r = (255, 0, 0)     # red
