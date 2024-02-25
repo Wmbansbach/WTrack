@@ -30,7 +30,7 @@
 
 from ppd import PullPageData
 from storage_tools import StorageTools
-from cmd import CmdInterface
+from prompt import CmdInterface
 
 stor_tools = StorageTools()
 ppd = PullPageData()

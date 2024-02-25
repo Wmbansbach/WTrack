@@ -134,10 +134,11 @@ class StorageTools:
             buffer.update({"Daily_High": pd.Series([datapoint.high]),
                        "Daily_Low": pd.Series([datapoint.low])})
                       
-        frame = frame.append(pd.DataFrame(buffer))
+        frame = pd.concat([pd.DataFrame(buffer), frame])
 
         # Append current interation's data to master dataframe
-        self.live_df = self.live_df.append(frame)   
+        #self.live_df = self.live_df.append(frame)   
+        self.live_df = pd.concat([frame, self.live_df])
 
         # Create/Append data to sql db, commit changes
         frame.to_sql("AccuWeather Datapoints", self.db_conn, if_exists='append')
@@ -163,10 +164,11 @@ class StorageTools:
                        "Local_Humidity": pd.Series([humdd]),
                        "Local_Pressure": pd.Series([presd])
                     }
-        frame = frame.append(pd.DataFrame(buffer))
+        frame = pd.concat([pd.DataFrame(buffer), frame])
 
         # Append current interation's pi sensor data to master dataframe
-        self.pi_df = self.pi_df.append(frame)   
+        self.pi_df = pd.concat([self.pi_df, frame])
+        #self.pi_df = self.pi_df.concat(frame)   
 
         # Create/Append data to sql db, commit changes, create csv file
         frame.to_sql("SenseHat Datapoints", self.db_conn, if_exists='append')
